@@ -6,7 +6,7 @@ import Icon from '@/components/ui/icon';
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState({ src: '', alt: '', title: '', description: '' });
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -34,10 +34,32 @@ const Index = () => {
     }
   ];
 
-  const openLightbox = (image: typeof galleryImages[0]) => {
-    setCurrentImage(image);
+  const openLightbox = (index: number) => {
+    setCurrentImageIndex(index);
     setLightboxOpen(true);
   };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxOpen) return;
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'Escape') setLightboxOpen(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen]);
+
+  const currentImage = galleryImages[currentImageIndex];
 
   return (
     <div className="min-h-screen bg-white">
@@ -85,7 +107,7 @@ const Index = () => {
               <Card 
                 key={index}
                 className="group overflow-hidden border-0 shadow-none hover:shadow-2xl transition-all duration-500 cursor-pointer"
-                onClick={() => openLightbox(image)}
+                onClick={() => openLightbox(index)}
               >
                 {image.isCustom ? (
                   <div className="relative h-[400px] overflow-hidden bg-black flex items-center justify-center">
@@ -190,6 +212,23 @@ const Index = () => {
             >
               <Icon name="X" size={32} />
             </button>
+
+            <button
+              onClick={prevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white hover:text-gray-300 transition-all hover:scale-110 bg-black/50 hover:bg-black/70 rounded-full p-4"
+              aria-label="Предыдущее изображение"
+            >
+              <Icon name="ChevronLeft" size={32} />
+            </button>
+
+            <button
+              onClick={nextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white hover:text-gray-300 transition-all hover:scale-110 bg-black/50 hover:bg-black/70 rounded-full p-4"
+              aria-label="Следующее изображение"
+            >
+              <Icon name="ChevronRight" size={32} />
+            </button>
+
             {currentImage.isCustom ? (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="w-64 h-64 bg-white"></div>
@@ -202,9 +241,14 @@ const Index = () => {
               />
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-8">
-              <h3 className="text-3xl font-heading font-semibold text-white mb-2">
-                {currentImage.title}
-              </h3>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-3xl font-heading font-semibold text-white">
+                  {currentImage.title}
+                </h3>
+                <span className="text-white/60 text-sm">
+                  {currentImageIndex + 1} / {galleryImages.length}
+                </span>
+              </div>
               <p className="text-lg text-gray-300">
                 {currentImage.description}
               </p>
