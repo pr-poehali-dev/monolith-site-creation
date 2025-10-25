@@ -7,6 +7,7 @@ const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageTransition, setImageTransition] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -40,11 +41,19 @@ const Index = () => {
   };
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+    setImageTransition(true);
+    setTimeout(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % galleryImages.length);
+      setImageTransition(false);
+    }, 150);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+    setImageTransition(true);
+    setTimeout(() => {
+      setCurrentImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+      setImageTransition(false);
+    }, 150);
   };
 
   useEffect(() => {
@@ -229,18 +238,20 @@ const Index = () => {
               <Icon name="ChevronRight" size={32} />
             </button>
 
-            {currentImage.isCustom ? (
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-64 h-64 bg-white"></div>
-              </div>
-            ) : (
-              <img
-                src={currentImage.src}
-                alt={currentImage.alt}
-                className="max-w-full max-h-full object-contain"
-              />
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-8">
+            <div className={`w-full h-full flex items-center justify-center transition-opacity duration-150 ${imageTransition ? 'opacity-0' : 'opacity-100'}`}>
+              {currentImage.isCustom ? (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-64 h-64 bg-white"></div>
+                </div>
+              ) : (
+                <img
+                  src={currentImage.src}
+                  alt={currentImage.alt}
+                  className="max-w-full max-h-full object-contain"
+                />
+              )}
+            </div>
+            <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-8 transition-opacity duration-150 ${imageTransition ? 'opacity-0' : 'opacity-100'}`}>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-3xl font-heading font-semibold text-white">
                   {currentImage.title}
