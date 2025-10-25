@@ -40,6 +40,15 @@ const Index = () => {
     setLightboxOpen(true);
   };
 
+  const goToImage = (index: number) => {
+    if (index === currentImageIndex) return;
+    setImageTransition(true);
+    setTimeout(() => {
+      setCurrentImageIndex(index);
+      setImageTransition(false);
+    }, 150);
+  };
+
   const nextImage = () => {
     setImageTransition(true);
     setTimeout(() => {
@@ -251,7 +260,7 @@ const Index = () => {
                 />
               )}
             </div>
-            <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-8 transition-opacity duration-150 ${imageTransition ? 'opacity-0' : 'opacity-100'}`}>
+            <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-8 transition-opacity duration-150 ${imageTransition ? 'opacity-0' : 'opacity-100'}`}>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-3xl font-heading font-semibold text-white">
                   {currentImage.title}
@@ -260,9 +269,35 @@ const Index = () => {
                   {currentImageIndex + 1} / {galleryImages.length}
                 </span>
               </div>
-              <p className="text-lg text-gray-300">
+              <p className="text-lg text-gray-300 mb-6">
                 {currentImage.description}
               </p>
+              
+              <div className="flex gap-3 justify-center">
+                {galleryImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToImage(index)}
+                    className={`relative overflow-hidden transition-all duration-300 ${
+                      index === currentImageIndex 
+                        ? 'ring-2 ring-white scale-110' 
+                        : 'ring-1 ring-white/30 hover:ring-white/60 hover:scale-105'
+                    }`}
+                  >
+                    {image.isCustom ? (
+                      <div className="w-20 h-20 bg-black flex items-center justify-center">
+                        <div className="w-8 h-8 bg-white"></div>
+                      </div>
+                    ) : (
+                      <img
+                        src={image.src}
+                        alt={image.alt}
+                        className="w-20 h-20 object-cover"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </DialogContent>
