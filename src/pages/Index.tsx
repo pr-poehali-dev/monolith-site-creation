@@ -1,12 +1,43 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState({ src: '', alt: '', title: '', description: '' });
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  const galleryImages = [
+    {
+      src: 'https://cdn.poehali.dev/projects/24d9d1cb-776e-4117-9ed0-a7a5716c4363/files/b72d2268-b7ca-407a-835c-c61f87c1a728.jpg',
+      alt: 'Абстрактная форма',
+      title: 'Чистая форма',
+      description: 'Геометрическая простота как высшее проявление дизайна'
+    },
+    {
+      src: 'https://cdn.poehali.dev/projects/24d9d1cb-776e-4117-9ed0-a7a5716c4363/files/0d9f7f2c-e88c-4a0a-95ff-314068f6e335.jpg',
+      alt: 'Архитектурный монолит',
+      title: 'Брутализм',
+      description: 'Архитектурная честность через единство материала'
+    },
+    {
+      src: '',
+      alt: 'Контраст',
+      title: 'Контраст',
+      description: 'Сила противопоставления создаёт целостность',
+      isCustom: true
+    }
+  ];
+
+  const openLightbox = (image: typeof galleryImages[0]) => {
+    setCurrentImage(image);
+    setLightboxOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,55 +81,41 @@ const Index = () => {
             Примеры монолитности
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group overflow-hidden border-0 shadow-none hover:shadow-2xl transition-all duration-500">
-              <div className="relative h-[400px] overflow-hidden">
-                <img 
-                  src="https://cdn.poehali.dev/projects/24d9d1cb-776e-4117-9ed0-a7a5716c4363/files/b72d2268-b7ca-407a-835c-c61f87c1a728.jpg" 
-                  alt="Абстрактная форма" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-heading font-semibold text-black mb-3">
-                  Чистая форма
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Геометрическая простота как высшее проявление дизайна
-                </p>
-              </div>
-            </Card>
-
-            <Card className="group overflow-hidden border-0 shadow-none hover:shadow-2xl transition-all duration-500">
-              <div className="relative h-[400px] overflow-hidden">
-                <img 
-                  src="https://cdn.poehali.dev/projects/24d9d1cb-776e-4117-9ed0-a7a5716c4363/files/0d9f7f2c-e88c-4a0a-95ff-314068f6e335.jpg" 
-                  alt="Архитектурный монолит" 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-heading font-semibold text-black mb-3">
-                  Брутализм
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Архитектурная честность через единство материала
-                </p>
-              </div>
-            </Card>
-
-            <Card className="group overflow-hidden border-0 shadow-none hover:shadow-2xl transition-all duration-500">
-              <div className="relative h-[400px] overflow-hidden bg-black flex items-center justify-center">
-                <div className="w-32 h-32 bg-white"></div>
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-heading font-semibold text-black mb-3">
-                  Контраст
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Сила противопоставления создаёт целостность
-                </p>
-              </div>
-            </Card>
+            {galleryImages.map((image, index) => (
+              <Card 
+                key={index}
+                className="group overflow-hidden border-0 shadow-none hover:shadow-2xl transition-all duration-500 cursor-pointer"
+                onClick={() => openLightbox(image)}
+              >
+                {image.isCustom ? (
+                  <div className="relative h-[400px] overflow-hidden bg-black flex items-center justify-center">
+                    <div className="w-32 h-32 bg-white"></div>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center">
+                      <Icon name="Maximize2" className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={48} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative h-[400px] overflow-hidden">
+                    <img 
+                      src={image.src}
+                      alt={image.alt}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center">
+                      <Icon name="Maximize2" className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={48} />
+                    </div>
+                  </div>
+                )}
+                <div className="p-8">
+                  <h3 className="text-2xl font-heading font-semibold text-black mb-3">
+                    {image.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {image.description}
+                  </p>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
 
@@ -163,6 +180,38 @@ const Index = () => {
           </p>
         </div>
       </section>
+
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black border-0">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-4 right-4 z-50 text-white hover:text-gray-300 transition-colors"
+            >
+              <Icon name="X" size={32} />
+            </button>
+            {currentImage.isCustom ? (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="w-64 h-64 bg-white"></div>
+              </div>
+            ) : (
+              <img
+                src={currentImage.src}
+                alt={currentImage.alt}
+                className="max-w-full max-h-full object-contain"
+              />
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-8">
+              <h3 className="text-3xl font-heading font-semibold text-white mb-2">
+                {currentImage.title}
+              </h3>
+              <p className="text-lg text-gray-300">
+                {currentImage.description}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
